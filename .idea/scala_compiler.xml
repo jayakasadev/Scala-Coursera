@@ -4,5 +4,6 @@
     <profile name="SBT 1" modules="root">
       <option name="deprecationWarnings" value="true" />
     </profile>
+    <profile name="SBT 2" modules="src" />
   </component>
 </project>
