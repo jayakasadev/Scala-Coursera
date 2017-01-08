@@ -19,14 +19,14 @@ object FunSets {
   /**
    * Returns the set of the one given element.
    */
-    def singletonSet(elem: Int): Set = (x:Int) => x == elem
+  def singletonSet(elem: Int): Set = (x:Int) => x == elem
   
 
   /**
    * Returns the union of the two given sets,
    * the sets of all elements that are in either `s` or `t`.
    */
-    def union(s: Set, t: Set): Set = (elem: Int) => s(elem) || t(elem)
+  def union(s: Set, t: Set): Set = (elem: Int) => s(elem) || t(elem)
   
   /**
    * Returns the intersection of the two given sets,
@@ -57,7 +57,7 @@ object FunSets {
     def forall(s: Set, p: Int => Boolean): Boolean = {
       def iter(a: Int): Boolean = {
         if (a > bound) true
-        else if (!p(a) && s(a)) false
+        else if (s(a) && !p(a)) false
         else iter(a+1)
       }
       iter(-bound)
@@ -67,20 +67,45 @@ object FunSets {
    * Returns whether there exists a bounded integer within `s`
    * that satisfies `p`.
    */
+  /*
+    orig: 1 2 3
+    p: x => X > 2
+
+    exists(orig, p) -> !forall(orig, x => !p(x))
+      -> !(1 > 2) = True => False
+      -> !(2 > 2) = True => False
+      -> !(3 > 2) = False => True
+
+
+    exists(orig, p) -> forall(orig, x => p(x))
+      -> (1 > 2) = False
+      Terminates here and does not continue
+   */
     def exists(s: Set, p: Int => Boolean): Boolean = !forall(s, (elem:Int) => !p(elem))
   
   /**
    * Returns a set transformed by applying `f` to each element of `s`.
    */
+  def map(s: Set, f: Int => Int): Set = (elem: Int) => exists(s, (x: Int) => f(x) == elem)
+  // does not really modify the original Set
+  //defines a new Set which applies the function to the original set values
+  /*
+    orig: 1 2 3
+    map: f(1) f(2) f(3)
+
+    so map(orig, x => x * x)(2) = false
+    map(orig, x => x * x)(4) = true
+  */
+  /*
     def map(s: Set, f: Int => Int): Set = {
-      def transform(elem: Int, mapped: Set, f: Int => Int, base: Set): Set = {
+      def transform(elem: Int, mapped: Set): Set = {
         if(elem > bound) mapped
-        if(base(elem)) transform(elem+1, union(mapped, singletonSet(f(elem))), f, base)
-        else transform(elem+1, mapped, f, base)
+        if(s(elem)) transform(elem+1, union(mapped, singletonSet(f(elem))))
+        else transform(elem+1, mapped)
       }
-      transform(-bound, (x: Int) => false, f, s)
+      transform(-bound, (x: Int) => false)
     }
-  
+  */
   /**
    * Displays the contents of a set
    */
