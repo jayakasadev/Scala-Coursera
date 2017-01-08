@@ -73,12 +73,12 @@ object FunSets {
    * Returns a set transformed by applying `f` to each element of `s`.
    */
     def map(s: Set, f: Int => Int): Set = {
-      def transform(elem: Int, mapped: Set): Set = {
+      def transform(elem: Int, mapped: Set, f: Int => Int, base: Set): Set = {
         if(elem > bound) mapped
-        if(s(elem)) transform(elem+1, union(mapped, singletonSet(f(elem))))
-        else transform(elem+1, mapped)
+        if(base(elem)) transform(elem+1, union(mapped, singletonSet(f(elem))), f, base)
+        else transform(elem+1, mapped, f, base)
       }
-      transform(-bound, (x: Int) => false)
+      transform(-bound, (x: Int) => false, f, s)
     }
   
   /**
