@@ -24,9 +24,9 @@ object Huffman {
   
 
   // Part 1: Basics
-    def weight(tree: CodeTree): Int = ??? // tree match ...
-  
-    def chars(tree: CodeTree): List[Char] = ??? // tree match ...
+  def weight(tree: CodeTree): Int = ??? // tree match ...
+
+  def chars(tree: CodeTree): List[Char] = ??? // tree match ...
   
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
@@ -198,4 +198,4 @@ object Huffman {
    * and then uses it to perform the actual encoding.
    */
     def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = ???
-  }
+}
