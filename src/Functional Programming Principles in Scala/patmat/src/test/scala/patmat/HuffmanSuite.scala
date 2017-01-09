@@ -52,4 +52,20 @@ class HuffmanSuite extends FunSuite {
     }
   }
 
+  test("french Secret") {
+    new TestTrees {
+      // println(decodedSecret)
+      assert(decodedSecret === "huffmanestcool".toList)
+    }
+  }
+
+  test("createCodeTree(someText)") {
+    new TestTrees {
+      val l1 = createCodeTree(string2Chars("someText"))
+      //println(times(string2Chars("someText")))
+      //println(encode(l1)("someText".toList))
+      assert(decode(l1, encode(l1)("someText".toList)) === "someText".toList)
+    }
+  }
+
 }

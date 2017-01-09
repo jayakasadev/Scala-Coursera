@@ -87,7 +87,7 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs.sortWith((left, right) => left._2 < right._2).map(x => Leaf(x._1, x._2))
+    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = freqs.sortWith((left, right) => left._2 < right._2).map((x) => Leaf(x._1, x._2))
   
   /**
    * Checks whether the list `trees` contains only one single code tree.
@@ -107,8 +107,8 @@ object Huffman {
    * unchanged.
    */
   def combine(trees: List[CodeTree]): List[CodeTree] = trees match {
-    case List(_) => trees
     case left :: right :: rest => (makeCodeTree(left, right) :: rest).sortWith((left, right) => weight(left) < weight(right))
+    case _ => trees
   }
   
   /**
@@ -128,9 +128,9 @@ object Huffman {
    *    the example invocation. Also define the return type of the `until` function.
    *  - try to find sensible parameter names for `xxx`, `yyy` and `zzz`.
    */
-  def until(singleton: List[CodeTree] => Boolean, combine: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
-      if(singleton(trees)) trees
-      until(singleton, combine)(combine(trees))
+  def until(single: List[CodeTree] => Boolean, comb: List[CodeTree] => List[CodeTree])(trees: List[CodeTree]): List[CodeTree] = {
+      if(single(trees)) trees
+      else until(single, comb)(comb(trees))
   }
   
   /**
@@ -139,7 +139,7 @@ object Huffman {
    * The parameter `chars` is an arbitrary text. This function extracts the character
    * frequencies from that text and creates a code tree based on them.
    */
-  def createCodeTree(chars: List[Char]): CodeTree = (until(singleton, combine)(makeOrderedLeafList(times(chars)))).head
+  def createCodeTree(chars: List[Char]): CodeTree = until(singleton, combine)(makeOrderedLeafList(times(chars))).head
   
 
   // Part 3: Decoding
@@ -152,8 +152,10 @@ object Huffman {
    */
     def decode(tree: CodeTree, bits: List[Bit]): List[Char] = {
       def traverse(list: CodeTree, bits: List[Bit]): List[Char] = list match {
-        case Leaf(char, _) => if(bits.isEmpty) List(char) else char :: traverse(tree, bits)
-        case Fork(left, right, _, _) => if(bits.isEmpty) List() else if(bits.head == 0) traverse(left, bits.tail) else traverse(right, bits.tail)
+        case Leaf(c, _) if(bits.isEmpty) => List(c)
+        case Leaf(c, _) => c :: traverse(tree, bits)
+        case Fork(left, right, _, _) if(bits.head == 0) => traverse(left, bits.tail)
+        case Fork(left, right, _, _) => traverse(right, bits.tail)
       }
       traverse(tree, bits)
     }
@@ -185,8 +187,9 @@ object Huffman {
    */
     def encode(tree: CodeTree)(text: List[Char]): List[Bit] = {
       def lookup(list: CodeTree, text: Char): List[Bit] = list match {
-        case Leaf(char, _) => List()
-        case Fork(left, right, _, _) => if(chars(left).contains(text)) 0 :: lookup(left, text) else 1 :: lookup(left, text)
+        case Leaf(_, _) => List()
+        case Fork(left, right, _, _) if(chars(left).contains(text)) => 0 :: lookup(left, text)
+        case Fork(_, right, _, _) if(chars(right).contains(text))=> 1 :: lookup(right, text)
       }
       text flatMap(char => lookup(tree, char))
     }
