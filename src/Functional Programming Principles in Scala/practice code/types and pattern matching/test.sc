@@ -1,3 +1,2 @@
-val list = List('a', 'b', 'b', 'c', 'a', 'd', 'e', 'b', 'b', 'a', 'f', 'e', 'g', 'o')
-list map(x => list.count(_ == x))
-list map(x => (x, list.count( _ == x)))
+val chars = List('a', 'b', 'b', 'c', 'a', 'd', 'e', 'b', 'b', 'a', 'f', 'e', 'g', 'o')
+chars groupBy(identity) mapValues(list => list.size) toList
