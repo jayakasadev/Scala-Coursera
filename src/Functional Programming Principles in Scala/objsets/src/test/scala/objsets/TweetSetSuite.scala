@@ -71,4 +71,13 @@ class TweetSetSuite extends FunSuite {
     }
   }
 
+  test("mostRetweeted googleTweets") {
+    new TestSets {
+      //GoogleVsApple.googleTweets foreach println
+
+      // println("Most Retweeted --> " + GoogleVsApple.googleTweets.mostRetweeted)
+      assert(GoogleVsApple.googleTweets.mostRetweeted.retweets == 290)
+    }
+  }
+
   }

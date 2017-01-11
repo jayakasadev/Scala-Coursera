@@ -33,9 +33,8 @@ object Huffman {
     case Leaf(char, _) => List(char)
     case Fork(_, _, chars, _) => chars
   }// tree match ...
-  
-  def makeCodeTree(left: CodeTree, right: CodeTree) =
-    Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
+
+  def makeCodeTree(left: CodeTree, right: CodeTree) = Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
 
 
@@ -75,7 +74,7 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-    def times(chars: List[Char]): List[(Char, Int)] = chars groupBy(identity) mapValues(list => list.size) toList
+  def times(chars: List[Char]): List[(Char, Int)] = chars groupBy(identity) mapValues(list => list.size) toList
   
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -209,7 +208,8 @@ object Huffman {
    * a valid code tree that can be represented as a code table. Using the code tables of the
    * sub-trees, think of how to build the code table for the entire tree.
    */
-    def convert(tree: CodeTree): CodeTable = tree match {
+  // TODO fix bug here
+  def convert(tree: CodeTree): CodeTable = tree match {
       case Leaf(char, _) => List((char, List()))
       case Fork(left, right, _, _) => mergeCodeTables(convert(left), convert(right))
     }
@@ -219,7 +219,7 @@ object Huffman {
    * use it in the `convert` method above, this merge method might also do some transformations
    * on the two parameter code tables.
    */
-    def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = a ::: b
+  def mergeCodeTables(a: CodeTable, b: CodeTable): CodeTable = a ::: b
   
   /**
    * This function encodes `text` according to the code tree `tree`.
@@ -227,5 +227,6 @@ object Huffman {
    * To speed up the encoding process, it first converts the code tree to a code table
    * and then uses it to perform the actual encoding.
    */
-    def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = text flatMap((char) => codeBits(convert(tree))(char))
+  // TODO fix bug here
+  def quickEncode(tree: CodeTree)(text: List[Char]): List[Bit] = text flatMap((char) => codeBits(convert(tree))(char))
 }

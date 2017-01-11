@@ -6,9 +6,7 @@ import TweetReader._
  * A class to represent tweets.
  */
 class Tweet(val user: String, val text: String, val retweets: Int) {
-  override def toString: String =
-    "User: " + user + "\n" +
-    "Text: " + text + " [" + retweets + "]"
+  override def toString: String = "User: " + user + "\n" + "Text: " + text + " [" + retweets + "]"
 }
 
 /**
@@ -83,6 +81,13 @@ abstract class TweetSet {
    */
 
   /**
+    * Check if the set is empty
+    *
+    * @return true if empty, else false
+    */
+  def isEmpty: Boolean = true
+
+  /**
    * Returns a new `TweetSet` which contains all elements of this set, and the
    * the new element `tweet` in case it does not already exist in this set.
    *
@@ -125,6 +130,8 @@ class Empty extends TweetSet {
 
 class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
 
+  override def isEmpty:Boolean = false
+
   def filterAcc(p: Tweet => Boolean, acc: TweetSet): TweetSet = {
       if(p(elem))
         left.filterAcc(p, right.filterAcc(p, acc.incl(elem)))
@@ -135,18 +142,20 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   override def union(that: TweetSet): TweetSet = (left union (right union that)).incl(elem)
 
   override  def mostRetweeted: Tweet = {
-    try{
-      val leftTweet = left.mostRetweeted
-      val rightTweet = right.mostRetweeted
-      if(leftTweet.retweets > elem.retweets && rightTweet.retweets < leftTweet.retweets)
-        leftTweet
-      else if(rightTweet.retweets > elem.retweets && rightTweet.retweets > leftTweet.retweets)
-        rightTweet
+    lazy val leftTweet = left.mostRetweeted
+    lazy val rightTweet = right.mostRetweeted
+
+    if(left.isInstanceOf[NonEmpty] && leftTweet.retweets > elem.retweets){
+      if(right.isInstanceOf[NonEmpty] ){
+        if(leftTweet.retweets < rightTweet.retweets)
+          rightTweet
+      }
+      leftTweet
     }
-    catch{
-      case e: Exception => //do nothing yet
-    }
-    elem
+    else if(right.isInstanceOf[NonEmpty] && rightTweet.retweets > elem.retweets)
+      rightTweet
+    else
+      elem
   }
 
   /**
@@ -167,10 +176,11 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
    * The following methods are already implemented
    */
 
-  def contains(x: Tweet): Boolean =
+  def contains(x: Tweet): Boolean = {
     if (x.text < elem.text) left.contains(x)
     else if (elem.text < x.text) right.contains(x)
     else true
+  }
 
   def incl(x: Tweet): TweetSet = {
     if (x.text < elem.text) new NonEmpty(elem, left.incl(x), right)
@@ -178,10 +188,11 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
     else this
   }
 
-  def remove(tw: Tweet): TweetSet =
+  def remove(tw: Tweet): TweetSet = {
     if (tw.text < elem.text) new NonEmpty(elem, left.remove(tw), right)
     else if (elem.text < tw.text) new NonEmpty(elem, left, right.remove(tw))
     else left.union(right)
+  }
 
   def foreach(f: Tweet => Unit): Unit = {
     f(elem)
@@ -194,11 +205,12 @@ trait TweetList {
   def head: Tweet
   def tail: TweetList
   def isEmpty: Boolean
-  def foreach(f: Tweet => Unit): Unit =
+  def foreach(f: Tweet => Unit): Unit = {
     if (!isEmpty) {
       f(head)
       tail.foreach(f)
     }
+  }
 }
 
 object Nil extends TweetList {
@@ -215,11 +227,11 @@ class Cons(val head: Tweet, val tail: TweetList) extends TweetList {
 object GoogleVsApple {
   val google = List("android", "Android", "galaxy", "Galaxy", "nexus", "Nexus")
   val apple = List("ios", "iOS", "iphone", "iPhone", "ipad", "iPad")
-  lazy val list = google ++ apple
+  // lazy val list = google ++ apple
 
-  lazy val googleTweets: TweetSet = TweetReader.allTweets.filter((tweet: Tweet) => google exists(tweet.text.contains(_)))
+  lazy val googleTweets: TweetSet = TweetReader.allTweets.filter((tweet: Tweet) => google exists(elem => tweet.text.contains(elem)))
 
-  lazy val appleTweets: TweetSet = TweetReader.allTweets.filter((tweet: Tweet) => apple exists(tweet.text.contains(_)))
+  lazy val appleTweets: TweetSet = TweetReader.allTweets.filter((tweet: Tweet) => apple exists(elem => tweet.text.contains(elem)))
   
   /**
    * A list of all tweets mentioning a keyword from either apple or google,
