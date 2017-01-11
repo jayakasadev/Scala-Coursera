@@ -144,18 +144,34 @@ class NonEmpty(elem: Tweet, left: TweetSet, right: TweetSet) extends TweetSet {
   override  def mostRetweeted: Tweet = {
     lazy val leftTweet = left.mostRetweeted
     lazy val rightTweet = right.mostRetweeted
-
-    if(left.isInstanceOf[NonEmpty] && leftTweet.retweets > elem.retweets){
-      if(right.isInstanceOf[NonEmpty] ){
-        if(leftTweet.retweets < rightTweet.retweets)
+    //println("curr -> "+ elem.retweets)
+    if (left.isInstanceOf[NonEmpty] && leftTweet.retweets > elem.retweets) {
+      //println("\tleft evaled ->" + leftTweet.retweets)
+      if (right.isInstanceOf[NonEmpty]) {
+        //println("\tright evaling ->" + rightTweet.retweets)
+        if (leftTweet.retweets < rightTweet.retweets) {
+          //println("\t\t\tcurr max 1 R --> R: " + rightTweet.retweets + " L: " + leftTweet.retweets + " Elem: " + elem.retweets)
           rightTweet
+        }
+        else{
+          //println("\t\t\tcurr max 2 L --> L" + leftTweet.retweets + " R: " + rightTweet.retweets + " Elem: " + elem.retweets)
+          leftTweet
+        }
       }
-      leftTweet
+      else{
+        //println("\t\tcurr max 3 L --> L" + leftTweet.retweets + " Elem: " + elem.retweets)
+        leftTweet
+      }
     }
-    else if(right.isInstanceOf[NonEmpty] && rightTweet.retweets > elem.retweets)
+    else if (right.isInstanceOf[NonEmpty] && rightTweet.retweets > elem.retweets) {
+      //println("\tright evaled->" + rightTweet.retweets)
+      //println("\t\tcurr max 4 R --> R: " + rightTweet.retweets + " Elem: " + elem.retweets)
       rightTweet
-    else
+    }
+    else{
+      //println("\tcurr max 5 E --> Elem: " + elem.retweets)
       elem
+    }
   }
 
   /**
