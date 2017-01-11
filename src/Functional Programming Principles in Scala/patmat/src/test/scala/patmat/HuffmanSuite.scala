@@ -64,8 +64,13 @@ class HuffmanSuite extends FunSuite {
       val l1 = createCodeTree(string2Chars("someText"))
       //println(times(string2Chars("someText")))
       //println(encode(l1)("someText".toList))
-      assert(decode(l1, encode(l1)("someText".toList)) === "someText".toList)
+      assert(decode(l1, encode(l1)("someText".toList)) == "someText".toList)
     }
   }
 
+  test("quick encode frenchCode") {
+    new TestTrees {
+      assert(quickEncode(frenchCode)("huffmanestcool".toList).size > 0)
+    }
+  }
 }

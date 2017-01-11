@@ -80,9 +80,9 @@ class TweetSetSuite extends FunSuite {
 
       val temp = GoogleVsApple.googleTweets
       val removed = temp.remove(temp.mostRetweeted)
-      removed foreach println
+      // removed foreach println
       val out = removed.mostRetweeted.retweets
-      println(out)
+      // println(out)
       assert(out == 131)
 
     }
